@@ -4,7 +4,7 @@ using MathNet.Numerics;
 using MathNet.Numerics.IntegralTransforms;
 using System.Numerics;
 
-class Program
+class GuitarTuner_Console_App_Main
 {
     static void Main()
     {

@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36414.22 d17.14
+VisualStudioVersion = 17.14.36414.22
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JoelMarji_GuitarTuner_Capstone", "JoelMarji_GuitarTuner_Capstone\JoelMarji_GuitarTuner_Capstone.csproj", "{55A8E5A0-1251-4BBD-B202-33E924EFEE2C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GuitarTuner_Console_App", "GuitarTuner_Console_App\GuitarTuner_Console_App.csproj", "{55A8E5A0-1251-4BBD-B202-33E924EFEE2C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GuitarTuner_GUI_App", "GuitarTuner_GUI_App\GuitarTuner_GUI_App\GuitarTuner_GUI_App.csproj", "{F4DAC464-2E7E-42AF-BF66-F447A3316E61}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{55A8E5A0-1251-4BBD-B202-33E924EFEE2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{55A8E5A0-1251-4BBD-B202-33E924EFEE2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{55A8E5A0-1251-4BBD-B202-33E924EFEE2C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4DAC464-2E7E-42AF-BF66-F447A3316E61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4DAC464-2E7E-42AF-BF66-F447A3316E61}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4DAC464-2E7E-42AF-BF66-F447A3316E61}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4DAC464-2E7E-42AF-BF66-F447A3316E61}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
