@@ -1,5 +1,8 @@
 ﻿using System;
 using SDL2;
+using MathNet.Numerics;
+using MathNet.Numerics.IntegralTransforms;
+using System.Numerics;
 
 class Program
 {
@@ -53,7 +56,7 @@ class Program
 
         Console.WriteLine("Run Analysis? (y/n)");
         if (Console.ReadLine() == "y"){
-            RunAnalysis(micDeviceID);
+            RunAnalysis(micDeviceID, sDL_AudioSpecHave);
         }
         else{
             SDL.SDL_Quit();
@@ -100,7 +103,7 @@ class Program
         }
     }
 
-    static void RunAnalysis(uint micID) // Run audio analysis
+    static void RunAnalysis(uint micID, SDL.SDL_AudioSpec have) // Run audio analysis
     {
         SDL.SDL_PauseAudioDevice(micID, 0);
 
@@ -111,7 +114,6 @@ class Program
         uint bufferSamples = 4096; // Samples per pull
         float[] floatBuffer = new float[bufferSamples]; // Buffer to store float samples
         byte[] rawBuffer = new byte[bufferSamples * floatSize]; // Raw bytes from SDL
-        uint bytesToRead = (uint)rawBuffer.Length; //cast as uint 
 
         
 
@@ -125,18 +127,43 @@ class Program
                     fixed (byte* ptr = rawBuffer)
                     {
                         //cannot pass managed byte[] directly into dequeue function, must convert to IntPtr
-                        SDL.SDL_DequeueAudio(micID, (IntPtr)ptr, bytesToRead); 
+                        SDL.SDL_DequeueAudio(micID, (IntPtr)ptr, (uint)rawBuffer.Length); 
                     }
                 }
 
                 Buffer.BlockCopy(rawBuffer, 0, floatBuffer, 0, rawBuffer.Length);
 
-                Console.Write("Samples: ");
-                for (int i = 0; i<5; i++)
+                Complex[] fftBuffer = new Complex[floatBuffer.Length];
+                for (int i = 0; i < floatBuffer.Length; i++)
                 {
-                    Console.Write($"{floatBuffer[i]:F3}");
+                    fftBuffer[i] = new Complex(floatBuffer[i], 0.0); // imaginary part = 0
                 }
-                Console.WriteLine();
+                // Perform FFT (in-place)
+                Fourier.Forward(fftBuffer, FourierOptions.Matlab);
+
+                double[] magnitudes = new double[fftBuffer.Length/2];
+                for (int i = 0; i < magnitudes.Length; i++)
+                {
+                    magnitudes[i] = fftBuffer[i].Magnitude;
+                }
+
+                int peakIndex = 0;
+                double peakValue = 0;
+
+                for (int i = 0; i<magnitudes.Length; i++)
+                {
+                    if (magnitudes[i] > peakValue)
+                    {
+                        peakValue = magnitudes[i];
+                        peakIndex = i;
+                    }
+                }
+
+                //f = (K/N)*R
+                double dominantFrequency = ((double)have.freq / fftBuffer.Length) * peakIndex;
+
+                Console.WriteLine($"Dominant Frequency: {dominantFrequency:F1} Hz");
+
             }
             System.Threading.Thread.Sleep(50);// Delay to avoid tight CPU loop
         }
