@@ -28,7 +28,7 @@ namespace TunerCore
         {
             double freq = GetDominantFreq(samples);
 
-            if (freq <= 0)
+            if (freq <= 0 || freq < 20.0)
             {
                 return new TuningResult();
             }
@@ -54,7 +54,8 @@ namespace TunerCore
             {
                 Frequency = freq,
                 NoteName = noteName,
-                CentsDeviation = cents
+                CentsDeviation = cents,
+                isValid = true
             };
         }
 
