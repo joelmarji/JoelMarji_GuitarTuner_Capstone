@@ -129,10 +129,10 @@ namespace TunerCore
 
             // Threshold to ignore background noise
             //TODO: tune this threshold
-            //if (peakValue < 0.1)
-            //{
-            //    return 0.0;
-            //}
+            if (peakValue < 0.1)
+            {
+                return 0.0;
+            }
 
             
 
