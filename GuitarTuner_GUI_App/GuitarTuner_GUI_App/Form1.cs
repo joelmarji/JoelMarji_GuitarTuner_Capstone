@@ -19,8 +19,8 @@ namespace GuitarTuner_GUI_App
         {
             InitializeComponent();
 
-            tunerNeedle.Minimum = 0;
-            tunerNeedle.Maximum = 50;
+            tunerNeedleFlat.Minimum = 0;
+            tunerNeedleFlat.Maximum = 50;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -62,26 +62,6 @@ namespace GuitarTuner_GUI_App
             }
         }
 
-        private void micComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void noteLbl_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void centsLbl_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void tunerNeedle_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void analysisTimer_Tick(object sender, EventArgs e)
         {
             float[] samples = audio.CaptureSamples(4096);
@@ -96,8 +76,32 @@ namespace GuitarTuner_GUI_App
                 noteLbl.Text = result.NoteName;
                 string sign = result.CentsDeviation >= 0 ? "+" : "";
                 centsLbl.Text = $"{sign}{result.CentsDeviation} cents";
+                //Set icon
+                if (result.CentsDeviation >= 5 || result.CentsDeviation <= -5)
+                {
+                    
+                    CheckImage.Visible = false;
+                    xImage.Visible = true;
+                }
+                else
+                {
+                    CheckImage.Visible = true;
+                    xImage.Visible = false;
+                }
 
-                tunerNeedle.Value = Math.Max(tunerNeedle.Minimum, Math.Min(tunerNeedle.Maximum , result.CentsDeviation));
+                tunerNeedleFlat.Value = 0;
+                tunerNeedleSharp.Value = 0;
+
+                int deviation = result.CentsDeviation;
+
+                if (deviation < 0)
+                {
+                    tunerNeedleFlat.Value = Math.Min(tunerNeedleFlat.Maximum, Math.Abs(deviation));
+                }
+                else if (deviation > 0)
+                {
+                    tunerNeedleSharp.Value = Math.Min(tunerNeedleSharp.Maximum, deviation);
+                }
             }
         }
 
