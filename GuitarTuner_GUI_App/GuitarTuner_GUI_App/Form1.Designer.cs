@@ -40,13 +40,18 @@
             this.tunerNeedleSharp = new System.Windows.Forms.ProgressBar();
             this.CheckImage = new System.Windows.Forms.PictureBox();
             this.xImage = new System.Windows.Forms.PictureBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.freqAdjust = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.CheckImage)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.xImage)).BeginInit();
             this.SuspendLayout();
             // 
             // startBtn
             // 
-            this.startBtn.Location = new System.Drawing.Point(406, 466);
+            this.startBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.startBtn.Location = new System.Drawing.Point(396, 467);
             this.startBtn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.startBtn.Name = "startBtn";
             this.startBtn.Size = new System.Drawing.Size(175, 85);
@@ -57,18 +62,19 @@
             // 
             // micComboBox
             // 
+            this.micComboBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.micComboBox.FormattingEnabled = true;
             this.micComboBox.Location = new System.Drawing.Point(579, 71);
-            this.micComboBox.Margin = new System.Windows.Forms.Padding(4);
+            this.micComboBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.micComboBox.Name = "micComboBox";
-            this.micComboBox.Size = new System.Drawing.Size(380, 24);
+            this.micComboBox.Size = new System.Drawing.Size(380, 33);
             this.micComboBox.TabIndex = 1;
             // 
             // noteLbl
             // 
             this.noteLbl.AutoSize = true;
             this.noteLbl.Font = new System.Drawing.Font("Microsoft Sans Serif", 25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.noteLbl.Location = new System.Drawing.Point(398, 244);
+            this.noteLbl.Location = new System.Drawing.Point(388, 245);
             this.noteLbl.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.noteLbl.Name = "noteLbl";
             this.noteLbl.Size = new System.Drawing.Size(48, 48);
@@ -79,7 +85,7 @@
             // 
             this.centsLbl.AutoSize = true;
             this.centsLbl.Font = new System.Drawing.Font("Microsoft Sans Serif", 25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.centsLbl.Location = new System.Drawing.Point(465, 244);
+            this.centsLbl.Location = new System.Drawing.Point(455, 245);
             this.centsLbl.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.centsLbl.Name = "centsLbl";
             this.centsLbl.Size = new System.Drawing.Size(168, 48);
@@ -88,8 +94,10 @@
             // 
             // tunerNeedleFlat
             // 
-            this.tunerNeedleFlat.Location = new System.Drawing.Point(316, 323);
-            this.tunerNeedleFlat.Margin = new System.Windows.Forms.Padding(4);
+            this.tunerNeedleFlat.Cursor = System.Windows.Forms.Cursors.Default;
+            this.tunerNeedleFlat.Location = new System.Drawing.Point(306, 324);
+            this.tunerNeedleFlat.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tunerNeedleFlat.MarqueeAnimationSpeed = 1;
             this.tunerNeedleFlat.Name = "tunerNeedleFlat";
             this.tunerNeedleFlat.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
             this.tunerNeedleFlat.RightToLeftLayout = true;
@@ -103,16 +111,18 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(715, 51);
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(682, 42);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(122, 16);
+            this.label1.Size = new System.Drawing.Size(181, 25);
             this.label1.TabIndex = 5;
             this.label1.Text = "Microphone Select:";
             // 
             // tunerNeedleSharp
             // 
-            this.tunerNeedleSharp.Location = new System.Drawing.Point(540, 323);
-            this.tunerNeedleSharp.Margin = new System.Windows.Forms.Padding(4);
+            this.tunerNeedleSharp.Location = new System.Drawing.Point(530, 324);
+            this.tunerNeedleSharp.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tunerNeedleSharp.MarqueeAnimationSpeed = 1;
             this.tunerNeedleSharp.Name = "tunerNeedleSharp";
             this.tunerNeedleSharp.Size = new System.Drawing.Size(150, 45);
             this.tunerNeedleSharp.TabIndex = 6;
@@ -121,7 +131,7 @@
             // 
             this.CheckImage.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("CheckImage.BackgroundImage")));
             this.CheckImage.InitialImage = ((System.Drawing.Image)(resources.GetObject("CheckImage.InitialImage")));
-            this.CheckImage.Location = new System.Drawing.Point(473, 323);
+            this.CheckImage.Location = new System.Drawing.Point(463, 324);
             this.CheckImage.Name = "CheckImage";
             this.CheckImage.Size = new System.Drawing.Size(60, 55);
             this.CheckImage.TabIndex = 7;
@@ -132,17 +142,62 @@
             this.xImage.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("xImage.BackgroundImage")));
             this.xImage.ErrorImage = null;
             this.xImage.InitialImage = ((System.Drawing.Image)(resources.GetObject("xImage.InitialImage")));
-            this.xImage.Location = new System.Drawing.Point(473, 323);
+            this.xImage.Location = new System.Drawing.Point(463, 324);
             this.xImage.Name = "xImage";
             this.xImage.Size = new System.Drawing.Size(60, 55);
             this.xImage.TabIndex = 8;
             this.xImage.TabStop = false;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(8, 74);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(48, 25);
+            this.label2.TabIndex = 9;
+            this.label2.Text = "A = ";
+            // 
+            // freqAdjust
+            // 
+            this.freqAdjust.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.freqAdjust.Location = new System.Drawing.Point(62, 71);
+            this.freqAdjust.Multiline = true;
+            this.freqAdjust.Name = "freqAdjust";
+            this.freqAdjust.Size = new System.Drawing.Size(77, 33);
+            this.freqAdjust.TabIndex = 10;
+            this.freqAdjust.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.freqAdjust.TextChanged += new System.EventHandler(this.freqAdjust_TextChanged);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(145, 74);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(36, 25);
+            this.label3.TabIndex = 11;
+            this.label3.Text = "Hz";
+            // 
+            // button1
+            // 
+            this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button1.Location = new System.Drawing.Point(62, 110);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(77, 49);
+            this.button1.TabIndex = 12;
+            this.button1.Text = "Enter";
+            this.button1.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(982, 653);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.freqAdjust);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.xImage);
             this.Controls.Add(this.CheckImage);
             this.Controls.Add(this.tunerNeedleSharp);
@@ -154,7 +209,7 @@
             this.Controls.Add(this.startBtn);
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "Guitar Tuner GUI App";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.CheckImage)).EndInit();
@@ -176,6 +231,10 @@
         private System.Windows.Forms.ProgressBar tunerNeedleSharp;
         private System.Windows.Forms.PictureBox CheckImage;
         internal System.Windows.Forms.PictureBox xImage;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox freqAdjust;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Button button1;
     }
 }
 

@@ -23,31 +23,36 @@ namespace TunerCore
             this.sampleRate = sampleRate;
         }
 
-        //Analyzes audio samples and returns closest musical note
+        // Analyzes audio samples and returns closest musical note
         public TuningResult GetNote(float[] samples)
         {
             double freq = GetDominantFreq(samples);
 
             if (freq <= 0 || freq < 20.0)
             {
-                return new TuningResult();
+                return new TuningResult()
+                {
+                    isValid = false
+                };
             }
 
-            //Convert frequency to MIDI note number (A4 = 69)
+            // Convert frequency to MIDI note number (A4 = 69)
+            // Default tuning A4 = 440Hz
+            // TODO: Allow user to adjust A4 tuning
             double noteNumber = 12 * Math.Log((freq / 440), 2) + 69;
 
-            //find closest int note
+            // Find closest int note
             int roundedNoteNumber = (int)Math.Round(noteNumber);
 
-            //find note name
+            // Find note name
             int noteIndex = roundedNoteNumber % 12;
             string name = NoteNames[noteIndex];
 
-            //find octave
+            // Find octave
             int octave = (roundedNoteNumber / 12) - 1;
             string noteName = name + octave; //e.g. "A4"
 
-            //find deviation in cents (1/100th of a note)
+            // Find deviation in cents (1/100th of a note)
             int cents = (int)((noteNumber - roundedNoteNumber) * 100);
 
             return new TuningResult
@@ -59,8 +64,8 @@ namespace TunerCore
             };
         }
 
-        //Use FFT analysis to find dominant frequency of mic input buffer
-        //Private, GetNote is new public API
+        // Use FFT, Quadratic Interpolation, HPS, and Hann Window to find dominant frequency of mic input buffer
+        // Private, GetNote is public API
         private double GetDominantFreq(float[] samples)
         {
             if (samples == null || samples.Length == 0)
@@ -69,21 +74,24 @@ namespace TunerCore
             }
 
             // Apply Hann Windowing function to reduce spectral leakage by processing samples
+            // "Smoothly" tapering the beginning and end of the sample buffer to zero
             float[] windowedSamples = new float[samples.Length];
             for (int i=0; i<samples.Length; i++)
             {
-                //calculate hann window multiplier
+                // Calculate hann window multiplier
                 double multiplier = 0.5 * (1 - Math.Cos(2 * Math.PI * i / (samples.Length - 1)));
 
                 windowedSamples[i] = (float)(samples[i] * multiplier);
             }
-            // Load FFT buffer with samples and perform FFT on buffer
+
+            // Load FFT buffer with samples
             Complex[] fftBuffer = new Complex[samples.Length];
             for (int i = 0; i < samples.Length; i++)
             {
                 fftBuffer[i] = new Complex(windowedSamples[i], 0);
             }
 
+            // Perform FFT
             Fourier.Forward(fftBuffer, FourierOptions.Matlab);
 
             double[] magnitudes = new double[samples.Length / 2];
@@ -94,11 +102,10 @@ namespace TunerCore
                 hpsMagnitudes[i] = fftBuffer[i].Magnitude;
             }
 
-            // Magnitudes logic only finds the most dominant frequency, which may return false 
-            // values due to harmonics when being played on an actual instrument. Use Harmonic Product
-            // Spectrum algorithm to find the fundamental frequency:
+            // Use Harmonic Product Spectrum (HPS) to reduce octave errors
+            // due to harmonics having higher amplitudes than fundamental freq
 
-            for (int i = 1; i<magnitudes.Length/4; i++) //4 harmonics to check
+            for (int i = 1; i<magnitudes.Length/4; i++) // Check 4 harmonics
             {
                 //"Squish" samples 
                 hpsMagnitudes[i] *= magnitudes[i * 2];
@@ -111,16 +118,17 @@ namespace TunerCore
             double peakValue = 0.0;
             int hpsPeakIndex = 0;
             double hpsPeakValue = 0.0;  
+
             for (int i = 1; i < magnitudes.Length; i++)
             {
-                //find original peak for Quadratic interpolation
+                // Sort original peak for Quadratic interpolation
                 if (magnitudes[i] > peakValue)
                 {
                     peakValue = magnitudes[i];
                     peakIndex = i;
                 }
 
-                //find peak of hpsMagnitudes
+                //Sort HPS peak for frequency selection
                 if (hpsMagnitudes[i] > hpsPeakValue)
                 {
                     hpsPeakValue = hpsMagnitudes[i];
@@ -129,13 +137,10 @@ namespace TunerCore
             }
 
             // Threshold to ignore background noise
-            //TODO: tune this threshold
             if (peakValue < 0.1)
             {
                 return 0.0;
             }
-
-            
 
             // Bounds Check:
             if (peakIndex <= 0 || peakIndex >= magnitudes.Length - 1)
@@ -151,15 +156,16 @@ namespace TunerCore
             double peakMag = magnitudes[peakIndex];
 
             // Avoid division by 0
-            if (Math.Abs(leftMag - (2 * peakMag) + rightMag) < 0.00001)
+            if (Math.Abs(leftMag - (2 * peakMag) + rightMag) <= 0)
             {
                 return ((double)sampleRate / samples.Length) * peakIndex;
             }
 
+            // Perform Quadratic Interpolation
             double offset = (0.5 * (leftMag - rightMag)) / (leftMag - (2 * peakMag) + rightMag);
             double preciseIndex = peakIndex + offset;
 
-
+            // Find dominant frequency using precise index
             // Freq = (K/N) * R 
             double dominantFreq = ((double)sampleRate / samples.Length) * preciseIndex;
             return dominantFreq;

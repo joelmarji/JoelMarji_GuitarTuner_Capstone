@@ -18,9 +18,7 @@ namespace GuitarTuner_GUI_App
         public Form1()
         {
             InitializeComponent();
-
-            tunerNeedleFlat.Minimum = 0;
-            tunerNeedleFlat.Maximum = 50;
+            int userFreq = 440;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -38,7 +36,7 @@ namespace GuitarTuner_GUI_App
             micComboBox.Items.AddRange(mics);
             micComboBox.SelectedIndex = 0;
 
-            analysisTimer.Interval = 50; 
+            analysisTimer.Interval = 50;
         }
 
         private void startBtn_Click(object sender, EventArgs e)
@@ -64,22 +62,21 @@ namespace GuitarTuner_GUI_App
 
         private void analysisTimer_Tick(object sender, EventArgs e)
         {
-            float[] samples = audio.CaptureSamples(4096);
+            float[] samples = audio.CaptureSamples(4096); // Collect audio sample buffer
             if (samples == null || samples.Length == 0)
             {
                 return;
             }
 
-            TuningResult result = analyzer.GetNote(samples);
+            TuningResult result = analyzer.GetNote(samples); // Pass in audio samples to be processed
             if (result.isValid)
             {
                 noteLbl.Text = result.NoteName;
                 string sign = result.CentsDeviation >= 0 ? "+" : "";
                 centsLbl.Text = $"{sign}{result.CentsDeviation} cents";
-                //Set icon
+                // Set icon
                 if (result.CentsDeviation >= 5 || result.CentsDeviation <= -5)
                 {
-                    
                     CheckImage.Visible = false;
                     xImage.Visible = true;
                 }
@@ -105,9 +102,26 @@ namespace GuitarTuner_GUI_App
             }
         }
 
+        //TODO:
+        // Finish this feature 
+        private void freqAdjust_TextChanged(object sender, EventArgs e)
+        {
+            string f = freqAdjust.Text;
+            if (int.TryParse(f, out int userFreq))
+            {
+                userFreq = Math.Max(400, Math.Min(480, userFreq)); //clamp between 400 and 480
+                freqAdjust.Text = f;
+            }
+            else
+            {
+                //invalid input, reset to 440
+                freqAdjust.Text = "440";
+            }
+        }
+
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            //dispose audio resources
+            // Dispose audio resources
             if (audio != null)
             {
                 audio.Dispose();
