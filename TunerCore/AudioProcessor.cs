@@ -12,7 +12,7 @@ namespace TunerCore
 
         public SDL.SDL_AudioSpec AudioSpec => sDL_AudioSpecHave;
 
-        //initialize audio
+        // Initialize audio
         public AudioProcessor()
         {
             if (SDL.SDL_InitSubSystem(SDL.SDL_INIT_AUDIO) < 0)
@@ -36,7 +36,7 @@ namespace TunerCore
             SDL.SDL_AudioSpec sDL_AudioSpecWant = new SDL.SDL_AudioSpec
             {
                 freq = 44100,               //sample rate in Hz
-                format = SDL.AUDIO_F32,     
+                format = SDL.AUDIO_F32,     //32-bit float format
                 channels = 1,               //mono input
                 samples = 4096,             //buffer size (approx 93ms of audio at 44100Hz)
                 callback = null             //tell SDL to disable callbacks, using SDL_DequeueAudio instead (push method)
@@ -46,8 +46,8 @@ namespace TunerCore
             micDeviceID = SDL.SDL_OpenAudioDevice(
                 micName,
                 1,
-                ref sDL_AudioSpecWant, //request microphone parameters from SDl
-                out sDL_AudioSpecHave, //sdl returns available parameters
+                ref sDL_AudioSpecWant, // Request microphone parameters from SDL
+                out sDL_AudioSpecHave, // SDL returns available parameters
                 0
             );
 
@@ -84,6 +84,7 @@ namespace TunerCore
             return names;
         }
 
+        // Pull audio samples from the microphone buffer 
         public float[] CaptureSamples(int bufferSamples)
         { 
             if (!isDeviceOpen)
@@ -115,10 +116,10 @@ namespace TunerCore
                 }
                 Buffer.BlockCopy(rawBuffer, 0, floatBuffer, 0, rawBuffer.Length);
             }
-
             return floatBuffer;
         }
 
+        // Clean up audio resources on close
         public void Dispose()
         {
             if (micDeviceID != 0)

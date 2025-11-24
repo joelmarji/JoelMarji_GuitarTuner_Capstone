@@ -75,7 +75,7 @@ namespace GuitarTuner_GUI_App
                 string sign = result.CentsDeviation >= 0 ? "+" : "";
                 centsLbl.Text = $"{sign}{result.CentsDeviation} cents";
                 // Set icon
-                if (result.CentsDeviation >= 5 || result.CentsDeviation <= -5)
+                if (result.CentsDeviation > 5 || result.CentsDeviation < -5)
                 {
                     CheckImage.Visible = false;
                     xImage.Visible = true;
