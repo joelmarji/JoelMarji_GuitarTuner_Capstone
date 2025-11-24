@@ -15,6 +15,8 @@ namespace TunerCore
     public class FFTAnalyzer
     {
         private int sampleRate;
+        public double BaseFrequency { get; set; } = 440.0;
+
         private static string[] NoteNames =
             { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
 
@@ -39,7 +41,7 @@ namespace TunerCore
             // Convert frequency to MIDI note number (A4 = 69)
             // Default tuning A4 = 440Hz
             // TODO: Allow user to adjust A4 tuning
-            double noteNumber = 12 * Math.Log((freq / 440), 2) + 69;
+            double noteNumber = 12 * Math.Log((freq / BaseFrequency), 2) + 69;
 
             // Find closest int note
             int roundedNoteNumber = (int)Math.Round(noteNumber);

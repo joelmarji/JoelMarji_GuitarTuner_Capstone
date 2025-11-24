@@ -15,10 +15,24 @@ namespace GuitarTuner_GUI_App
     {
         private AudioProcessor audio;
         private FFTAnalyzer analyzer;
+
+        // Default A4 frequency = 440Hz
+        private double currentA4Freq = 440.0;
+
         public Form1()
         {
             InitializeComponent();
-            int userFreq = 440;
+
+            // Set initial GUI values
+            freqAdjust.Text = "440";
+            tunerNeedleFlat.Minimum = 0;
+            tunerNeedleFlat.Maximum = 50;
+            // Ensure this is set for visual correctness
+            tunerNeedleFlat.RightToLeft = RightToLeft.Yes;
+            tunerNeedleFlat.RightToLeftLayout = true;
+
+            tunerNeedleSharp.Minimum = 0;
+            tunerNeedleSharp.Maximum = 50;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -102,20 +116,33 @@ namespace GuitarTuner_GUI_App
             }
         }
 
-        //TODO:
-        // Finish this feature 
-        private void freqAdjust_TextChanged(object sender, EventArgs e)
+        private void enterBtn_Click(object sender, EventArgs e)
         {
-            string f = freqAdjust.Text;
-            if (int.TryParse(f, out int userFreq))
+            string input = freqAdjust.Text;
+            if (double.TryParse(input, out double parsedFreq))
             {
-                userFreq = Math.Max(400, Math.Min(480, userFreq)); //clamp between 400 and 480
-                freqAdjust.Text = f;
+                if (parsedFreq < 400)
+                {
+                    parsedFreq = 400;
+                }
+                else if (parsedFreq > 480)
+                {
+                    parsedFreq = 480;
+                }
+                currentA4Freq = parsedFreq;
+
+                // Update analyzer
+                if (analyzer != null)
+                {
+                    analyzer.BaseFrequency = currentA4Freq;
+                }
+
+                freqAdjust.Text = currentA4Freq.ToString();
             }
             else
             {
-                //invalid input, reset to 440
-                freqAdjust.Text = "440";
+                // Revert box to the last known good value if garbage input
+                freqAdjust.Text = currentA4Freq.ToString();
             }
         }
 
