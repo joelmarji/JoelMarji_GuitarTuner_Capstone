@@ -25,6 +25,29 @@ namespace TunerCore
             }
         }
 
+        public string[] GetMicrophoneList()
+        {
+            if (!isInitialized)
+            {
+                return Array.Empty<string>();
+            }
+
+            int count = SDL.SDL_GetNumAudioDevices(iscapture: 1); //iscapture > 0 for recording devices
+            if (count <= 0)
+            {
+                //no microphones found
+                return Array.Empty<string>();
+            }
+
+            string[] names = new string[count];
+            for (int i = 0; i < count; i++)
+            {
+                names[i] = SDL.SDL_GetAudioDeviceName(i, 1);
+            }
+
+            return names;
+        }
+
         public bool OpenDevice(string micName)
         {
             if (!isInitialized)
@@ -39,8 +62,7 @@ namespace TunerCore
                 format = SDL.AUDIO_F32,     //32-bit float format
                 channels = 1,               //mono input
                 samples = 4096,             //buffer size (approx 93ms of audio at 44100Hz)
-                callback = null             //tell SDL to disable callbacks, using SDL_DequeueAudio instead (push method)
-                                            //if null causes issues, figure out how to use IntPtr.Zero instead
+                callback = null             //tell SDL to disable callbacks, using SDL_DequeueAudio instead (push/pull method)
             };
 
             micDeviceID = SDL.SDL_OpenAudioDevice(
@@ -61,29 +83,6 @@ namespace TunerCore
             return true;
         }
 
-        public string[] GetMicrophoneList()
-        {
-            if (!isInitialized)
-            {
-                return Array.Empty<string>();
-            }
-
-            int count = SDL.SDL_GetNumAudioDevices(iscapture: 1); //iscapture > 0 for recording devices
-            if (count <= 0)
-            {
-                //no microphones found
-                return Array.Empty<string>();
-            }
-
-            string[] names = new string[count];
-            for (int i = 0; i < count; i++)
-            {
-                names[i] = SDL.SDL_GetAudioDeviceName(i, 1);
-            }   
-
-            return names;
-        }
-
         // Pull audio samples from the microphone buffer 
         public float[] CaptureSamples(int bufferSamples)
         { 
@@ -97,7 +96,7 @@ namespace TunerCore
             int floatSize = sizeof(float);
             byte[] rawBuffer = new byte [bufferSamples * floatSize];
 
-            //return null if not enough data is queued.
+            // Return null if not enough data is queued.
             if (SDL.SDL_GetQueuedAudioSize(micDeviceID) < rawBuffer.Length)
             {
                 return null;

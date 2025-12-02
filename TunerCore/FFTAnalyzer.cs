@@ -107,12 +107,11 @@ namespace TunerCore
             // Use Harmonic Product Spectrum (HPS) to reduce octave errors
             // due to harmonics having higher amplitudes than fundamental freq
 
-            for (int i = 1; i<magnitudes.Length/4; i++) // Check 4 harmonics
+            for (int i = 1; i<magnitudes.Length/3; i++) // Check 3 harmonics
             {
                 //"Squish" samples 
                 hpsMagnitudes[i] *= magnitudes[i * 2];
                 hpsMagnitudes[i] *= magnitudes[i * 3];
-                hpsMagnitudes[i] *= magnitudes[i * 4];
             }
 
             // Find peak magnitudes
@@ -139,33 +138,44 @@ namespace TunerCore
             }
 
             // Threshold to ignore background noise
-            if (peakValue < 0.1)
+            if (peakValue < 0.2)
             {
                 return 0.0;
             }
 
+            // If HPS signal is too weak, use basic peakIndex
+            int indexToUse = 0;
+            if (hpsPeakIndex > 0 && hpsPeakValue > (peakValue * 0.01)) 
+            {
+                indexToUse = hpsPeakIndex;
+            }
+            else
+            {
+                indexToUse = peakIndex;
+            }
+
             // Bounds Check:
-            if (peakIndex <= 0 || peakIndex >= magnitudes.Length - 1)
+            if (indexToUse <= 0 || indexToUse >= magnitudes.Length - 1)
             {
                 // Cant interpolate, return basic bin freq
-                return ((double)sampleRate / samples.Length) * peakIndex;
+                return ((double)sampleRate / samples.Length) * indexToUse;
             }
 
             // FFT algorithm will sort frequencies into "bins", use Quadratic interpolation 
             // to find peaks based on peakMagnitude, peakValue, leftMagnitude and rightMagnitude
-            double leftMag = magnitudes[peakIndex - 1];
-            double rightMag = magnitudes[peakIndex + 1];
-            double peakMag = magnitudes[peakIndex];
+            double leftMag = magnitudes[indexToUse - 1];
+            double rightMag = magnitudes[indexToUse + 1];
+            double peakMag = magnitudes[indexToUse];
 
             // Avoid division by 0
             if (Math.Abs(leftMag - (2 * peakMag) + rightMag) <= 0)
             {
-                return ((double)sampleRate / samples.Length) * peakIndex;
+                return ((double)sampleRate / samples.Length) * indexToUse;
             }
 
             // Perform Quadratic Interpolation
             double offset = (0.5 * (leftMag - rightMag)) / (leftMag - (2 * peakMag) + rightMag);
-            double preciseIndex = peakIndex + offset;
+            double preciseIndex = indexToUse + offset;
 
             // Find dominant frequency using precise index
             // Freq = (K/N) * R 

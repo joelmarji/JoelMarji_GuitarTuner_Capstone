@@ -35,7 +35,7 @@ class GuitarTuner_Console_App_Main
                 return;
             }
 
-            // create FFT analyzer
+            // Create FFT analyzer
             FFTAnalyzer analyzer = new FFTAnalyzer(audio.AudioSpec.freq);
             Console.WriteLine($"Mic open. Sample Rate: {audio.AudioSpec.freq} Hz.");
             Console.WriteLine("Recording... press any key to stop.");
