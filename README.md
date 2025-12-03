@@ -2,6 +2,10 @@
 
 A real-time, chromatic instrument tuner built with C# and Windows Forms. This application uses advanced signal processing techniques (FFT, HPS, Hann Window, Quadratic Interpolation) to detect musical notes with high precision, filtering out background noise and harmonic overtones.
 
+![Tuner Screenshot](GuitarTunerGUI.png)
+
+![Tuner Screenshot](GuitarTunerConsole.png)
+
 ## Features
 
 * **Real-Time Audio Analysis:** Captures low-latency audio using SDL2.
@@ -33,6 +37,8 @@ This tuner implements a 4-stage processing pipeline to ensure accuracy:
     * If the signal is too weak for HPS, it  falls back to raw peak detection to maintain sensitivity.
 4.  **Quadratic Interpolation:**
     * Since FFT bins are discrete (approx. 10Hz wide), the true peak often lies between two bins. Quadratic Interpolation fits a parabola to the peak and its neighbors to calculate the fractional offset, improving precision to ~0.1Hz.
+
+![Tuner Screenshot](TunerApp-Flowchart-2025-12-02.png)
 
 ## Project Structure
 
