@@ -1,7 +1,19 @@
-﻿using System;
-using System.Numerics;
+﻿/* File name: GuitarTuner_Console_App_Main.cs
+    Description:
+    A console application that uses the TunerCore library to capture audio from a microphone,
+    analyze the frequency, and display the detected musical note along with its deviation in cents.
+
+    Developed by: Joel Marji
+    Date Created: 09/28/2025
+    Date Modified: 12/03/2025
+*/
 using MathNet.Numerics;
 using MathNet.Numerics.IntegralTransforms;
+using Microsoft.Win32;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
 
 namespace TunerCore
 {
@@ -16,6 +28,9 @@ namespace TunerCore
     {
         private int sampleRate;
         public double BaseFrequency { get; set; } = 440.0;
+        private List<double> freqHistory = new List<double>();
+        private const int HistorySize = 7; // How many samples to average
+        private const double MaxJumpHz = 10.0; // If freq jumps more than this, treat as new note
 
         private static string[] NoteNames =
             { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
@@ -28,9 +43,9 @@ namespace TunerCore
         // Analyzes audio samples and returns closest musical note
         public TuningResult GetNote(float[] samples)
         {
-            double freq = GetDominantFreq(samples);
+            double instantFreq = GetDominantFreq(samples);
 
-            if (freq <= 0 || freq < 20.0)
+            if (instantFreq <= 0 || instantFreq < 20.0)
             {
                 return new TuningResult()
                 {
@@ -38,10 +53,28 @@ namespace TunerCore
                 };
             }
 
+            // Stabilize frequency using moving average
+            if (freqHistory.Count > 0)
+            {
+                double currentAvg = freqHistory.Average();
+                if (Math.Abs(instantFreq - currentAvg) > MaxJumpHz)
+                {
+                    freqHistory.Clear();
+                }
+            }
+
+            freqHistory.Add(instantFreq);
+            if (freqHistory.Count > HistorySize)
+            {
+                freqHistory.RemoveAt(0);
+            }
+
+            // Use smoothed frequency for note calculation
+            double smoothedFreq = freqHistory.Average();
+
             // Convert frequency to MIDI note number (A4 = 69)
             // Default tuning A4 = 440Hz
-            // TODO: Allow user to adjust A4 tuning
-            double noteNumber = 12 * Math.Log((freq / BaseFrequency), 2) + 69;
+            double noteNumber = 12 * Math.Log((smoothedFreq / BaseFrequency), 2) + 69;
 
             // Find closest int note
             int roundedNoteNumber = (int)Math.Round(noteNumber);
@@ -59,7 +92,7 @@ namespace TunerCore
 
             return new TuningResult
             {
-                Frequency = freq,
+                Frequency = smoothedFreq,
                 NoteName = noteName,
                 CentsDeviation = cents,
                 isValid = true
@@ -73,6 +106,39 @@ namespace TunerCore
             if (samples == null || samples.Length == 0)
             {
                 return 0.0;
+            }
+
+            // Use RMS Normalization to improve quality of signal
+            double avgAmplitude = 0;
+            for (int i = 0; i < samples.Length; i++)
+            {
+                avgAmplitude += samples[i];
+            }
+
+            avgAmplitude /= samples.Length;
+
+            for (int i= 0; i < samples.Length; i++)
+            {
+                samples[i] -= (float)avgAmplitude;
+            }
+
+            double sumSquares = 0;
+            for (int i = 0; i < samples.Length; i++)
+            {
+                sumSquares += samples[i] * samples[i];
+            }
+
+            double rms = Math.Sqrt(sumSquares / samples.Length);
+
+            if (rms > 0.001)
+            {
+                double targetRMS = .1; // Target RMS level
+                double gain = targetRMS / rms;
+
+                for (int i = 0; i < samples.Length; i++)
+                {
+                    samples[i] *= (float)gain;
+                }
             }
 
             // Apply Hann Windowing function to reduce spectral leakage by processing samples
@@ -107,18 +173,22 @@ namespace TunerCore
             // Use Harmonic Product Spectrum (HPS) to reduce octave errors
             // due to harmonics having higher amplitudes than fundamental freq
 
-            for (int i = 1; i<magnitudes.Length/3; i++) // Check 3 harmonics
+            for (int i = 1; i<magnitudes.Length/4; i++) // Check 4 harmonics
             {
                 //"Squish" samples 
-                hpsMagnitudes[i] *= magnitudes[i * 2];
-                hpsMagnitudes[i] *= magnitudes[i * 3];
+                // Multiply fundamental bin by its harmonics to compensate for internal 
+                // microphone rolloff of lower frequencies
+                hpsMagnitudes[i] = magnitudes[i] 
+                                 + (magnitudes[i * 2] * 0.9)
+                                 + (magnitudes[i * 3] * 0.7)
+                                 + (magnitudes[i * 4] * 0.5);
             }
 
             // Find peak magnitudes
             int peakIndex = 0;
             double peakValue = 0.0;
             int hpsPeakIndex = 0;
-            double hpsPeakValue = 0.0;  
+            double hpsPeakValue = 0.0;
 
             for (int i = 1; i < magnitudes.Length; i++)
             {
@@ -144,15 +214,15 @@ namespace TunerCore
             }
 
             // If HPS signal is too weak, use basic peakIndex
-            int indexToUse = 0;
-            if (hpsPeakIndex > 0 && hpsPeakValue > (peakValue * 0.01)) 
+            int indexToUse = hpsPeakIndex;
+            /*if (hpsPeakIndex > 0 && hpsPeakValue > (peakValue * 0.01)) 
             {
                 indexToUse = hpsPeakIndex;
             }
             else
             {
                 indexToUse = peakIndex;
-            }
+            }*/
 
             // Bounds Check:
             if (indexToUse <= 0 || indexToUse >= magnitudes.Length - 1)

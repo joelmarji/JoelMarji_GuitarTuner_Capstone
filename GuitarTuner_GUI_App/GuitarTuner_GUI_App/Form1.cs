@@ -1,4 +1,14 @@
-﻿using System;
+﻿/* File name: Form1.cs (GuitarTuner_GUI_App)
+    Description:
+    Windows Form application that provides a GUI for a guitar tuner using the TunerCore library.
+    Uses analysis timer to periodically capture audio samples and update the GUI with the detected note and deviation.
+
+    Developed by: Joel Marji
+    Date Created: 10/11/2025
+    Date Modified: 12/02/2025
+*/
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -89,7 +99,7 @@ namespace GuitarTuner_GUI_App
                 string sign = result.CentsDeviation >= 0 ? "+" : "";
                 centsLbl.Text = $"{sign}{result.CentsDeviation} cents";
                 // Set icon
-                if (result.CentsDeviation > 5 || result.CentsDeviation < -5)
+                if (result.CentsDeviation > 10 || result.CentsDeviation < -10)
                 {
                     CheckImage.Visible = false;
                     xImage.Visible = true;

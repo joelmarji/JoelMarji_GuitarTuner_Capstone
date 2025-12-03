@@ -1,4 +1,13 @@
-﻿using System;
+﻿/* File name: GuitarTuner_Console_App_Main.cs
+    Description:
+    A console application that uses the TunerCore library to capture audio from a microphone,
+    analyze the frequency, and display the detected musical note along with its deviation in cents.
+
+    Developed by: Joel Marji
+    Date Created: 09/16/2025
+    Date Modified: 12/02/2025
+*/
+using System;
 using System.Net;
 using SDL2;
 using TunerCore;
@@ -45,7 +54,7 @@ class GuitarTuner_Console_App_Main
                 float[] samples = audio.CaptureSamples(4096);
                 if (samples != null && samples.Length > 0)
                 {
-                    TuningResult result = analyzer.GetNote(samples);
+                    TuningResult result = analyzer.GetNote(samples); // Make tuning result object and pass in data
                     string sign;
                     if (result.CentsDeviation >= 0)
                     {

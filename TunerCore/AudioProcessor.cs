@@ -1,4 +1,14 @@
-﻿using System;
+﻿/* File name: AudioProcessor.cs
+    Description:
+    A class that handles audio input from a microphone using SDL2.
+    Member of the TunerCore library for audio processing in a guitar tuner application.
+
+    Developed by: Joel Marji
+    Date Created: 09/28/2025
+    Date Modified: 12/02/2025
+*/
+
+using System;
 using SDL2;
 
 namespace TunerCore
